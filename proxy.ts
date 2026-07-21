@@ -7,13 +7,13 @@ export async function proxy(request: NextRequest) {
     headers: await headers(),
   });
 
-  if (!session) {
-    return NextResponse.redirect(new URL("/sign-in", request.url));
+  if (session) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard"], // Specify the routes the middleware applies to
+  matcher: ["/sign-in", "/sign-up"], // Specify the routes the middleware applies to
 };

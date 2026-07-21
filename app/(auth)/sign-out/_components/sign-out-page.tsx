@@ -1,13 +1,14 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { authClient, useSession } from "@/client/lib/auth-client";
+import { redirect } from "next/navigation";
 
 export default function AccountPage() {
   const router = useRouter();
   const { data: session, isPending, isRefetching, error } = useSession();
 
   if (!session) {
-    return null;
+    redirect("/sign-in");
   }
   if (isPending) {
     return <p>Wait till you page loads</p>;

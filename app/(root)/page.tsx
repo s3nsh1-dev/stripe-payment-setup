@@ -1,17 +1,15 @@
-import { auth } from "@/server/lib/auth";
-import { headers } from "next/headers";
+import { requireUnAuth } from "@/server/lib/auth-guard";
 
 export default async function Home() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-  if (!session) {
-    return <div>No Authenticated User found</div>;
-  }
+  const session = await requireUnAuth();
   return (
     <div>
-      <h1>Welcome {session.user.name}</h1>
-      <p>{JSON.stringify(session)}</p>
+      {!session ? (
+        <div>No User Found</div>
+      ) : (
+        <div>{JSON.stringify(session)}</div>
+      )}
+      <p>Homepage</p>
     </div>
   );
 }
