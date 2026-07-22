@@ -1,15 +1,7 @@
-import { requireUnAuth } from "@/server/lib/auth-guard";
+import React from "react";
 
-export default async function Home() {
-  const session = await requireUnAuth();
-  return (
-    <div>
-      {!session ? (
-        <div>No User Found</div>
-      ) : (
-        <div>{JSON.stringify(session)}</div>
-      )}
-      <p>Homepage</p>
-    </div>
-  );
-}
+const Homepage = () => {
+  return <div>This is where the pricing of app will display</div>;
+};
+
+export default Homepage;
