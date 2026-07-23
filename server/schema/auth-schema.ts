@@ -92,12 +92,12 @@ export { user, session, account, verification };
 // inline with .references() above. If you ever need Drizzle's relational
 // query API (db.query.user.findMany({ with: { sessions: true } })), use
 // the new Drizzle v1.0 API:
-//
-//   import { defineRelations } from "drizzle-orm";
-//   import * as schema from "./auth-schema";
-//
-//    const relations = defineRelations(schema, (r) => ({
-//     user: { sessions: r.many.session(), accounts: r.many.account() },
-//     session: { user: r.one.user({ from: r.session.userId, to: r.user.id }) },
-//     account: { user: r.one.user({ from: r.account.userId, to: r.user.id }) },
-//   }));
+
+// import { defineRelations } from "drizzle-orm";
+// import * as schema from "./auth-schema";
+
+// const relations = defineRelations(schema, (r) => ({
+//   user: { sessions: r.many.session(), accounts: r.many.account() },
+//   session: { user: r.one.user({ from: r.session.userId, to: r.user.id }) },
+//   account: { user: r.one.user({ from: r.account.userId, to: r.user.id }) },
+// }));
