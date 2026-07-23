@@ -1,4 +1,13 @@
-import { pgTable, text, timestamp, boolean, index } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+  index,
+  pgEnum,
+} from "drizzle-orm/pg-core";
+
+export const planEnum = pgEnum("plan", ["FREE", "PRO", "PREMIUM"]); // adjust values to match yours
 
 const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -11,6 +20,11 @@ const user = pgTable("user", {
     .defaultNow()
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
+  plan: planEnum("plan").default("FREE").notNull(),
+  stripeCustomerId: text("stripeCustomerId"),
+  stripeSubscriptionId: text("stripeSubscriptionId"),
+  stripePriceId: text("stripePriceId"),
+  stripeCurrentPeriodEnd: text("stripeCurrentPeriodEnd"),
 });
 
 const session = pgTable(
