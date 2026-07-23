@@ -1,0 +1,47 @@
+export const plans = [
+  {
+    name: "Free",
+    price: "$0",
+    description: "Perfect for trying out the platform.",
+    features: [
+      "Email Authentication",
+      "Google OAuth",
+      "GitHub OAuth",
+      "Single Session",
+      "Community Support",
+    ],
+    button: "Get Started",
+    highlighted: false,
+    redirect: "/contact",
+  },
+  {
+    name: "Pro",
+    price: "$12",
+    description: "Ideal for freelancers and professionals.",
+    features: [
+      "Everything in Free",
+      "Unlimited Sessions",
+      "Priority Support",
+      "Advanced Dashboard",
+      "Usage Analytics",
+    ],
+    button: "Upgrade to Pro",
+    highlighted: true,
+    redirect: "/contact",
+  },
+  {
+    name: "Premium",
+    price: "$29",
+    description: "Built for teams and businesses.",
+    features: [
+      "Everything in Pro",
+      "Team Management",
+      "Role Based Access",
+      "Audit Logs",
+      "Premium Support",
+    ],
+    button: "Go Premium",
+    highlighted: false,
+    redirect: "/contact",
+  },
+];
