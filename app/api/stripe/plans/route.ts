@@ -5,7 +5,7 @@ import { envServer } from "@/server/utils/envServer";
 
 const stripe = new Stripe(envServer.STRIPE_SECRET_KEY);
 
-export async function POST() {
+export async function GET() {
   try {
     const plans = await stripe.plans.list({
       limit: 10,
@@ -18,8 +18,9 @@ export async function POST() {
       { status: 200 },
     );
   } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { message: "Something went wrong", data: error },
+      { message: "Something went wrong", error: message },
       { status: 500 },
     );
   }

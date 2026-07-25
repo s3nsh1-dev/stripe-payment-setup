@@ -1,9 +1,9 @@
-import stripe from "stripe";
-import { envServer } from "../utils/envServer";
+// import stripe from "stripe";
+// import { envServer } from "../utils/envServer";
 
-const stripeClient = new stripe(envServer.STRIPE_SECRET_KEY);
+// const stripeClient = new stripe(envServer.STRIPE_SECRET_KEY);
 
-const STRIPE_PUBLISHABLE_KEY = envServer.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+// const STRIPE_PUBLISHABLE_KEY = envServer.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
 const STRIPE_PRICE_LIST = {
   pro: {
@@ -29,8 +29,8 @@ const STRIPE_DEFAULT_PLAN_PRICE = "price_1TwWdtRYUVdsfWEPStBYxKeN";
 const STRIPE_PRODUCT_ID = "prod_UwPSVhz4PG85hQ";
 
 export {
-  stripeClient,
-  STRIPE_PUBLISHABLE_KEY,
+  // stripeClient,
+  // STRIPE_PUBLISHABLE_KEY,
   STRIPE_PRICE_LIST,
   STRIPE_DEFAULT_PLAN_PRICE,
   STRIPE_PRODUCT_ID,

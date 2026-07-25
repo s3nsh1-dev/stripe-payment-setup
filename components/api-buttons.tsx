@@ -1,52 +1,57 @@
 "use client";
-import { useStripePricing } from "@/client/hooks/useStripePricing";
-import { useStripeProducts } from "@/client/hooks/useStripeProducts";
-import { useStripePlans } from "@/client/hooks/useStripePlans";
+import { useFetchStripePrices } from "@/client/hooks/useFetchStripePrices";
+import { useFetchStripeProducts } from "@/client/hooks/useFetchStripeProducts";
+import { useFetchStripePlans } from "@/client/hooks/useFetchStripePlans";
+import { useFetchStripeProductById } from "@/client/hooks/useFetchStripeProductById";
 
 const ApiButtons = () => {
-  const priceFetch = useStripePricing();
-  const productFetch = useStripeProducts();
-  const planFetch = useStripePlans();
+  const priceFetch = useFetchStripePrices();
+  const productFetch = useFetchStripeProducts();
+  const planFetch = useFetchStripePlans();
+  const productByIdFetch = useFetchStripeProductById();
 
   const handleFetchPrice = async () => {
-    priceFetch.mutate(undefined, {
-      onSuccess: (data) => {
-        console.log("Stripe priceFetch data:", data);
-      },
-    });
+    const data = await priceFetch.refetch();
+    console.log("PRICES:", data);
   };
   const handleFetchProducts = async () => {
-    productFetch.mutate(undefined, {
-      onSuccess: (data) => {
-        console.log("Stripe productFetch data:", data);
-      },
-    });
+    const data = await productFetch.refetch();
+    console.log("PRODUCTS:", data);
   };
-  const handleFetchPlans = () => {
-    planFetch.mutate(undefined, {
-      onSuccess: (data) => {
-        console.log("Stripe planFetch data:", data);
-      },
-    });
+  const handleFetchPlans = async () => {
+    const data = await planFetch.refetch();
+    console.log("PLANS:", data);
   };
+
+  const handleFetchProductById = async () => {
+    const data = await productByIdFetch.refetch();
+    console.log("PRODUCT BY ID:", data);
+  };
+
   const btnInfo = [
     {
       id: 1,
-      text: priceFetch.isPending ? "Fetching..." : "Price",
+      text: priceFetch.isFetching ? "Fetching..." : "Price",
       action: handleFetchPrice,
-      disabled: priceFetch.isPending,
+      disabled: priceFetch.isFetching,
     },
     {
       id: 2,
-      text: productFetch.isPending ? "Fetching..." : "Products",
+      text: productFetch.isFetching ? "Fetching..." : "Products",
       action: handleFetchProducts,
-      disabled: productFetch.isPending,
+      disabled: productFetch.isFetching,
     },
     {
       id: 3,
-      text: priceFetch.isPending ? "Fetching..." : "Plan",
+      text: planFetch.isFetching ? "Fetching..." : "Plan",
       action: handleFetchPlans,
-      disabled: priceFetch.isPending,
+      disabled: planFetch.isFetching,
+    },
+    {
+      id: 4,
+      text: productByIdFetch.isFetching ? "Fetching..." : "Product By Id",
+      action: handleFetchProductById,
+      disabled: productByIdFetch.isFetching,
     },
   ];
 
