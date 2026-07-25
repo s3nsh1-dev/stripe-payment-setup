@@ -1,4 +1,4 @@
-// app/api/stripe/prices/route.ts => /v1/prices
+// app/api/stripe/products/route.ts => /v1/products
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { envServer } from "@/server/utils/envServer";
@@ -7,14 +7,13 @@ const stripe = new Stripe(envServer.STRIPE_SECRET_KEY);
 
 export async function POST() {
   try {
-    const prices = await stripe.prices.list({
+    const products = await stripe.products.list({
       limit: 10,
-      expand: ["data.product"], // optional: includes full product object, not just its ID
     });
     return NextResponse.json(
       {
-        message: "Prices successfully fetched",
-        data: prices,
+        message: "Product successfully fetched",
+        data: products,
       },
       { status: 200 },
     );

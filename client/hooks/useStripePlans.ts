@@ -1,14 +1,14 @@
 import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 
-const useStripePricing = () => {
+const useStripePlans = () => {
   return useMutation({
-    mutationKey: ["stripe-price-list"],
+    mutationKey: ["stripe-plan-list"],
     mutationFn: async () => {
-      const { data } = await axios.post("/api/stripe/prices");
+      const { data } = await axios.post("/api/stripe/plans");
       return data;
     },
   });
 };
 
-export { useStripePricing };
+export { useStripePlans };
