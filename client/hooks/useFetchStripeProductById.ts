@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { STRIPE_PRODUCT_ID } from "@/server/lib/stripe";
+import { STRIPE_PRODUCT_ID } from "@/client/constants/stripeConstants";
 
 const useFetchStripeProductById = () => {
   return useQuery({
