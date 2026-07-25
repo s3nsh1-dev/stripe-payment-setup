@@ -3,7 +3,7 @@ import axios from "axios";
 
 const useFetchStripeProducts = () => {
   return useQuery({
-    queryKey: ["stripe-product-list"],
+    queryKey: ["stripe-products"],
     queryFn: async () => {
       const { data } = await axios.get("/api/stripe/products");
       return data;
