@@ -6,6 +6,7 @@ import type {
 } from "@/types/clientSide.types";
 import { STRIPE_PRICE_LIST } from "@/client/constants/stripeConstants";
 import { useCreateCheckoutSession } from "@/client/hooks/useCreateCheckoutSession";
+import { redirect } from "next/navigation";
 
 const PlanCards: FC<{ plan: SubscriptionPlanType }> = ({ plan }) => {
   const checkout = useCreateCheckoutSession();
@@ -13,17 +14,15 @@ const PlanCards: FC<{ plan: SubscriptionPlanType }> = ({ plan }) => {
   const handleSubmission = async (name: AvailablePlansType) => {
     const planInfo = STRIPE_PRICE_LIST[name];
     alert(`You are tying to buy ${planInfo.lookup_key}`);
+    if (name === "FREE") redirect("/dashboard");
+
     try {
       checkout.mutate(
         { priceId: planInfo.price_id, quantity: 1 },
         {
           onSuccess: (res) => {
-            // window.location.href = res.data.url; // redirect to Stripe-hosted page
-            // console.log(res.data);
-          },
-          onSettled: (data) => {
-            alert("Your Request has been registered");
-            console.log(data);
+            window.location.href = res.data.url; // redirect to Stripe-hosted page
+            console.log(res.data);
           },
         },
       );
@@ -75,6 +74,7 @@ const PlanCards: FC<{ plan: SubscriptionPlanType }> = ({ plan }) => {
             : "border border-zinc-700 hover:bg-zinc-800"
         }`}
         onClick={() => handleSubmission(plan.name)}
+        disabled={checkout.isPending}
       >
         {plan.button}
       </button>

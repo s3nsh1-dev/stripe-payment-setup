@@ -3,8 +3,9 @@ import { db } from "@/server/config/db.connect";
 import { STRIPE_CLIENT } from "@/server/lib/stripe";
 import { envServer } from "@/server/utils/envServer";
 import { requireAuth } from "@/server/lib/auth-guard";
-import { user } from "@/server/schema";
+import { user, subscription } from "@/server/schema";
 import { eq } from "drizzle-orm";
+import { ALLOWED_PRICE_IDS } from "@/client/constants/stripeConstants";
 
 export async function POST(request: Request) {
   try {
@@ -20,48 +21,70 @@ export async function POST(request: Request) {
     // do we have price_id or not
     const body = await request.json();
     const { priceId, quantity = 1 } = body;
+
     if (!priceId) {
       return NextResponse.json(
         { message: "price_id not found" },
-        { status: 404 },
+        { status: 400 },
       );
     }
+    if (!ALLOWED_PRICE_IDS.has(priceId)) {
+      return NextResponse.json({ message: "Invalid priceId" }, { status: 400 });
+    }
 
-    // do we session user is actually in the db or not ?
     const userId = userSession.user.id;
-    const checkUser = await db.select().from(user).where(eq(user.id, userId));
-    if (!checkUser[0].id) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
-    }
 
-    // check if the user is a customer or not ?
-    let customerId = checkUser[0].stripeCustomerId;
-    if (!customerId) {
-      try {
-        const createCustomer = await STRIPE_CLIENT.customers.create({
-          email: checkUser[0].email,
-          metadata: {
-            userId: checkUser[0].id,
-            username: checkUser[0].name,
-            userImage: checkUser[0].image,
-          },
-        });
-        customerId = createCustomer.id;
+    const customerId = await db.transaction(async (tx) => {
+      // lock the subscription row for this user, if it exists
+      const subRows = await tx
+        .select()
+        .from(subscription)
+        .where(eq(subscription.userId, userId))
+        .for("update");
 
-        await db
-          .update(user)
-          .set({ stripeCustomerId: createCustomer.id })
-          .where(eq(user.id, checkUser[0].id));
-      } catch (error) {
-        const message =
-          error instanceof Error
-            ? error.message
-            : "UNEXPECTED ERROR WHILE SETTING CUSTOMER";
-        return NextResponse.json({ message }, { status: 500 });
+      const existingSub = subRows[0];
+
+      // already has a Stripe customer — reuse it, nothing else to do
+      if (existingSub?.stripeCustomerId) {
+        return existingSub.stripeCustomerId;
       }
-    }
 
-    const session = await STRIPE_CLIENT.checkout.sessions.create({
+      // need user's email/name to create the Stripe customer
+      const userRows = await tx.select().from(user).where(eq(user.id, userId));
+      const existingUser = userRows[0];
+
+      if (!existingUser) {
+        throw new Error("User not found");
+      }
+
+      const createCustomer = await STRIPE_CLIENT.customers.create({
+        email: existingUser.email,
+        metadata: {
+          userId: existingUser.id,
+          username: existingUser.name,
+        },
+      });
+
+      if (existingSub) {
+        // subscription row exists (e.g. FREE plan) but has no customerId yet
+        await tx
+          .update(subscription)
+          .set({ stripeCustomerId: createCustomer.id })
+          .where(eq(subscription.userId, userId));
+      } else {
+        // no subscription row at all yet — create one
+        await tx.insert(subscription).values({
+          id: crypto.randomUUID(),
+          userId,
+          stripeCustomerId: createCustomer.id,
+          plan: "FREE",
+        });
+      }
+
+      return createCustomer.id;
+    });
+
+    const checkoutSession = await STRIPE_CLIENT.checkout.sessions.create({
       customer: customerId,
       payment_method_types: ["card"],
       line_items: [
@@ -70,18 +93,18 @@ export async function POST(request: Request) {
           quantity,
         },
       ],
-      mode: "subscription", // or "payment" for one-time purchases
+      mode: "subscription",
       success_url: `${envServer.APP_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${envServer.APP_URL}/checkout/cancel`,
       metadata: {
-        userId: userId,
-        customerId: customerId,
-        priceId: priceId,
+        userId,
+        customerId,
+        priceId,
       },
     });
 
     return NextResponse.json(
-      { message: "Checkout session created", data: session },
+      { message: "Checkout session created", data: checkoutSession },
       { status: 200 },
     );
   } catch (error) {
@@ -92,10 +115,3 @@ export async function POST(request: Request) {
     );
   }
 }
-
-/**
- * user request for checkout for a plan with priceId
- * i take this plan and send request to stripe for checkout
- * if checkout is successful then i update the user table with stripe related info which is null by default (free tier)
- * i response back with url ?
- */

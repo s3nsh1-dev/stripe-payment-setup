@@ -18,6 +18,14 @@ const CheckoutPendingPage: FC<PropType> = ({ params }) => {
   if (validateSession.isError) {
     return <div>Unable to verify payment.</div>;
   }
+  if (validateSession.data?.payment_status === "unpaid") {
+    return (
+      <div>
+        There is some issue regarding you payment, please contact to helpdesk if
+        not resolved soon.
+      </div>
+    );
+  }
 
   return (
     <div>Transaction in progress, Please wait for sometime: {session_id}</div>

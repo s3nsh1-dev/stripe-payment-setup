@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const CheckoutCancelPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-900 px-4 py-12">
@@ -11,6 +13,12 @@ const CheckoutCancelPage = () => {
         <p className="mt-6 text-sm text-slate-400">
           Tell us why? We will work on it.
         </p>
+        <Link
+          href="/"
+          className="mt-8 inline-flex items-center justify-center rounded-2xl bg-slate-200 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+        >
+          Try again
+        </Link>
       </div>
     </div>
   );

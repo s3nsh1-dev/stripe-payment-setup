@@ -1,4 +1,4 @@
-import { plans, pricingTiers } from "@/client/constants/commonConstant";
+import { plans } from "@/client/constants/commonConstant";
 import { PlanCards } from "./plan-cards";
 
 const PriceListing = () => {

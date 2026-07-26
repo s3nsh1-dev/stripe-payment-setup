@@ -27,8 +27,14 @@ const STRIPE_PRICE_LIST: StripePriceListType = {
   },
 } as const;
 
-const STRIPE_DEFAULT_PLAN_PRICE = "price_1TwWdtRYUVdsfWEPStBYxKeN";
+const ALLOWED_PRICE_IDS = new Set([
+  "price_1TwWdtRYUVdsfWEPStBYxKeN",
+  "price_1Tx4jURYUVdsfWEPbsnlijnI",
+]);
 
-const STRIPE_PRODUCT_ID = "prod_UwPSVhz4PG85hQ";
+const PRICE_TO_TIER: Record<string, "PRO" | "PREMIUM"> = {
+  price_pro_monthly: "PRO",
+  price_premium_monthly: "PREMIUM",
+};
 
-export { STRIPE_PRICE_LIST, STRIPE_DEFAULT_PLAN_PRICE, STRIPE_PRODUCT_ID };
+export { STRIPE_PRICE_LIST, ALLOWED_PRICE_IDS, PRICE_TO_TIER };
