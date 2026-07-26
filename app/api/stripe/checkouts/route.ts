@@ -5,7 +5,10 @@ import { envServer } from "@/server/utils/envServer";
 import { requireAuth } from "@/server/lib/auth-guard";
 import { user, subscription } from "@/server/schema";
 import { eq } from "drizzle-orm";
-import { ALLOWED_PRICE_IDS } from "@/client/constants/stripeConstants";
+import {
+  ALLOWED_PRICE_IDS,
+  PRICE_TO_TIER,
+} from "@/client/constants/stripeConstants";
 
 export async function POST(request: Request) {
   try {
@@ -77,7 +80,7 @@ export async function POST(request: Request) {
           id: crypto.randomUUID(),
           userId,
           stripeCustomerId: createCustomer.id,
-          plan: "FREE",
+          plan: PRICE_TO_TIER[priceId],
         });
       }
 

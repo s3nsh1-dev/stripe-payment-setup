@@ -33,8 +33,8 @@ const ALLOWED_PRICE_IDS = new Set([
 ]);
 
 const PRICE_TO_TIER: Record<string, "PRO" | "PREMIUM"> = {
-  price_pro_monthly: "PRO",
-  price_premium_monthly: "PREMIUM",
+  price_1TwWdtRYUVdsfWEPStBYxKeN: "PRO",
+  price_1Tx4jURYUVdsfWEPbsnlijnI: "PREMIUM",
 };
 
 const STRIPE_PRODUCT_ID = "prod_UwPSVhz4PG85hQ";

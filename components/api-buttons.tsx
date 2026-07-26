@@ -33,8 +33,16 @@ const ApiButtons = () => {
   };
 
   const handleFetchSessionById = async () => {
-    const data = await sessionByIdFetch.refetch();
-    console.log(data);
+    const result = await sessionByIdFetch.refetch();
+
+    if (result.error) {
+      console.error("SESSION BY ID ERROR:", result.error);
+      return;
+    }
+
+    // The API returns { message, data }, so the Stripe Checkout Session is
+    // in result.data.data rather than result.data itself.
+    console.log("SESSION BY ID:", result.data?.data);
   };
 
   const btnInfo = [
