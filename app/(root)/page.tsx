@@ -1,15 +1,11 @@
-import { requireUnAuth } from "@/server/lib/auth-guard";
+import PriceListing from "@/components/price-listing";
+import ApiButtons from "@/components/api-buttons";
 
-export default async function Home() {
-  const session = await requireUnAuth();
+export default function HomePage() {
   return (
     <div>
-      {!session ? (
-        <div>No User Found</div>
-      ) : (
-        <div>{JSON.stringify(session)}</div>
-      )}
-      <p>Homepage</p>
+      <PriceListing />
+      <ApiButtons />
     </div>
   );
 }

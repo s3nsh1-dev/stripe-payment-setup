@@ -17,7 +17,7 @@ const Navbar = () => {
           href="/"
           className="text-lg font-semibold tracking-tight text-white"
         >
-          Better Auth Demo
+          Stripe Payment Integration
         </Link>
 
         {/* Navigation */}

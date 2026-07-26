@@ -1,0 +1,99 @@
+import type {
+  SubscriptionPlanType,
+  PricingTierType,
+} from "@/types/clientSide.types";
+
+export const plans: SubscriptionPlanType[] = [
+  {
+    name: "free",
+    price: "$0",
+    description: "Perfect for trying out the platform.",
+    features: [
+      "Email Authentication",
+      "Google OAuth",
+      "GitHub OAuth",
+      "Single Session",
+      "Community Support",
+    ],
+    button: "Get Started",
+    highlighted: false,
+    redirect: "/contact",
+  },
+  {
+    name: "pro",
+    price: "$12",
+    description: "Ideal for freelancers and professionals.",
+    features: [
+      "Everything in Free",
+      "Unlimited Sessions",
+      "Priority Support",
+      "Advanced Dashboard",
+      "Usage Analytics",
+    ],
+    button: "Upgrade to Pro",
+    highlighted: true,
+    redirect: "/contact",
+  },
+  {
+    name: "premium",
+    price: "$29",
+    description: "Built for teams and businesses.",
+    features: [
+      "Everything in Pro",
+      "Team Management",
+      "Role Based Access",
+      "Audit Logs",
+      "Premium Support",
+    ],
+    button: "Go Premium",
+    highlighted: false,
+    redirect: "/contact",
+  },
+];
+
+export const pricingTiers: PricingTierType[] = [
+  {
+    id: "free",
+    name: "Free",
+    price: 0,
+    priceId: null,
+    currency: "INR",
+    interval: "month",
+    features: [
+      "Access to basic features",
+      "Limited usage",
+      "Community support",
+    ],
+    isPopular: false,
+  },
+  {
+    id: "pro",
+    name: "Pro",
+    price: 10,
+    priceId: "pro",
+    currency: "INR",
+    interval: "month",
+    features: [
+      "All Free features",
+      "Generous usage limit",
+      "Priority support",
+      "Access to pro content",
+    ],
+    isPopular: true,
+  },
+  {
+    id: "premium",
+    name: "Premium",
+    price: 10,
+    priceId: "premium",
+    currency: "INR",
+    interval: "month",
+    features: [
+      "All Free features",
+      "Unlimited usage",
+      "Priority support",
+      "Access to premium content",
+    ],
+    isPopular: true,
+  },
+];

@@ -15,11 +15,11 @@ const envSchema = z.object({
   BETTER_AUTH_URL: z.string(),
   DATABASE_URL: z.string(),
   NODE_ENV: z.string(),
-  NEXT_PUBLIC_BASE_URL: z.string(),
   GITHUB_CLIENT_ID: z.string(),
   GITHUB_CLIENT_SECRET: z.string(),
   GOOGLE_OAUTH_CLIENT_ID: z.string(),
   GOOGLE_OAUTH_CLIENT_SECRET: z.string(),
+  APP_URL: z.string(),
 });
 
 const envServer = envSchema.parse(process.env);
