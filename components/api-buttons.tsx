@@ -11,25 +11,45 @@ const ApiButtons = () => {
   const planFetch = useFetchStripePlans();
   const productByIdFetch = useFetchStripeProductById();
   const sessionByIdFetch = useFetchStripeSession({
-    id: "cs_test_a1Z6MfjMuE1sI6XrFChfb8YrNUVo5e7Nj9DuWIX5VG93E4oszmZ7qmtyf3",
+    id: "",
   });
 
   const handleFetchPrice = async () => {
-    const data = await priceFetch.refetch();
-    console.log("PRICES:", data);
+    const result = await priceFetch.refetch();
+    if (result.error) {
+      console.error("SESSION BY ID ERROR:", result.error);
+      return;
+    }
+
+    console.log("PRICES:", result.data?.data);
   };
   const handleFetchProducts = async () => {
-    const data = await productFetch.refetch();
-    console.log("PRODUCTS:", data);
+    const result = await productFetch.refetch();
+    if (result.error) {
+      console.error("SESSION BY ID ERROR:", result.error);
+      return;
+    }
+
+    console.log("PRODUCTS:", result.data?.data);
   };
   const handleFetchPlans = async () => {
-    const data = await planFetch.refetch();
-    console.log("PLANS:", data);
+    const result = await planFetch.refetch();
+    if (result.error) {
+      console.error("SESSION BY ID ERROR:", result.error);
+      return;
+    }
+
+    console.log("PLANS:", result.data?.data);
   };
 
   const handleFetchProductById = async () => {
-    const data = await productByIdFetch.refetch();
-    console.log("PRODUCT BY ID:", data);
+    const result = await productByIdFetch.refetch();
+    if (result.error) {
+      console.error("SESSION BY ID ERROR:", result.error);
+      return;
+    }
+
+    console.log("PRODUCT BY ID:", result.data?.data);
   };
 
   const handleFetchSessionById = async () => {
