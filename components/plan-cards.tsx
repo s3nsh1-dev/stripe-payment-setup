@@ -2,11 +2,32 @@
 import type { FC } from "react";
 import type { SubscriptionPlanType } from "@/types/clientSide.types";
 import { STRIPE_PRICE_LIST } from "@/client/constants/stripeConstants";
+import { useCreateCheckoutSession } from "@/client/hooks/useCreateCheckoutSession";
 
 const PlanCards: FC<{ plan: SubscriptionPlanType }> = ({ plan }) => {
-  const handleSubmission = (name: "free" | "pro" | "premium") => {
+  const checkout = useCreateCheckoutSession();
+
+  const handleSubmission = async (name: "free" | "pro" | "premium") => {
     const planInfo = STRIPE_PRICE_LIST[name];
     alert(`You are tying to buy ${planInfo.lookup_key}`);
+    try {
+      checkout.mutate(
+        { priceId: planInfo.price_id, quantity: 1 },
+        {
+          onSuccess: (res) => {
+            // window.location.href = res.data.url; // redirect to Stripe-hosted page
+            // console.log(res.data);
+          },
+          onSettled: (data) => {
+            alert("Your Request has been registered");
+            console.log(data);
+          },
+        },
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error";
+      console.error(message);
+    }
   };
 
   return (

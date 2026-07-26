@@ -1,5 +1,5 @@
 export type SubscriptionPlanType = {
-  name: "free" | "pro" | "premium";
+  name: AvailablePlansType;
   price: string;
   description: string;
   features: string[];
@@ -8,7 +8,7 @@ export type SubscriptionPlanType = {
   redirect: string;
 };
 
-export type PricingTier = {
+export type PricingTierType = {
   id: string;
   name: string;
   price: number;
@@ -20,7 +20,7 @@ export type PricingTier = {
 };
 
 export type StripePriceConfig = {
-  id: string;
+  price_id: string;
   lookup_key: string;
   currency: string;
   product_id: string;
@@ -28,7 +28,7 @@ export type StripePriceConfig = {
   billing_scheme: "per_unit" | "tiered";
 };
 
-export type StripePriceList = Record<string, StripePriceConfig>;
-
 export type Plans = SubscriptionPlanType[];
-export type PricingTiers = PricingTier[];
+export type PricingTiers = PricingTierType[];
+export type AvailablePlansType = "free" | "pro" | "premium";
+export type StripePriceListType = Record<AvailablePlansType, StripePriceConfig>;

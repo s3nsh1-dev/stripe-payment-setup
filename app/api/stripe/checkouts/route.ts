@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(
-      { message: "Checkout session created", data: { url: session.url } },
+      { message: "Checkout session created", data: session },
       { status: 200 },
     );
   } catch (error) {
@@ -38,3 +38,10 @@ export async function POST(request: Request) {
     );
   }
 }
+
+/**
+ * user request for checkout for a plan with priceId
+ * i take this plan and send request to stripe for checkout
+ * if checkout is successful then i update the user table with stripe related info which is null by default (free tier)
+ * i response back with url ?
+ */

@@ -1,4 +1,8 @@
-import { SubscriptionPlanType } from "@/types/clientSide.types";
+import type {
+  SubscriptionPlanType,
+  PricingTierType,
+} from "@/types/clientSide.types";
+
 export const plans: SubscriptionPlanType[] = [
   {
     name: "free",
@@ -47,7 +51,7 @@ export const plans: SubscriptionPlanType[] = [
   },
 ];
 
-export const pricingTiers = [
+export const pricingTiers: PricingTierType[] = [
   {
     id: "free",
     name: "Free",
