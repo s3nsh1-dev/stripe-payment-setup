@@ -1,17 +1,31 @@
-// app/checkout/success/page.tsx
-export default async function CheckoutSuccessPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ session_id?: string }>;
-}) {
-  const { session_id } = await searchParams;
+import { useFetchStripeSession } from "@/client/hooks/useFetchStripeSession";
+import { use, type FC } from "react";
+
+const CheckoutSuccessPage: FC<PropType> = ({ params }) => {
+  const { session_id } = use(params);
+  const validateSession = useFetchStripeSession({ id: session_id || "" });
 
   if (!session_id) {
-    // handle missing session
+    return <div>Invalid session</div>;
   }
 
-  // Optionally verify server-side by retrieving the session from Stripe
-  // const session = await stripe.checkout.sessions.retrieve(session_id);
+  if (validateSession.isLoading) {
+    return <div>Loading...</div>;
+  }
 
-  return <div>Thanks! Session: {session_id}</div>;
-}
+  if (validateSession.isError) {
+    return <div>Unable to verify payment.</div>;
+  }
+
+  if (validateSession.data?.payment_status === "paid") {
+    return <div>🎉 You are subscribed! Welcome to Pro.</div>;
+  }
+
+  return <div>Payment not completed yet.</div>;
+};
+
+export default CheckoutSuccessPage;
+
+type PropType = {
+  params: Promise<{ session_id?: string }>;
+};

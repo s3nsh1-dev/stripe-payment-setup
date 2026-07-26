@@ -1,7 +1,7 @@
 import type { StripePriceListType } from "@/types/clientSide.types";
 
 const STRIPE_PRICE_LIST: StripePriceListType = {
-  free: {
+  FREE: {
     price_id: "no-price-for-free-tier",
     lookup_key: "free-plan",
     currency: "INR",
@@ -9,7 +9,7 @@ const STRIPE_PRICE_LIST: StripePriceListType = {
     type: "recurring",
     billing_scheme: "per_unit",
   },
-  pro: {
+  PRO: {
     price_id: "price_1TwWdtRYUVdsfWEPStBYxKeN",
     lookup_key: "pro-plan",
     currency: "INR",
@@ -17,7 +17,7 @@ const STRIPE_PRICE_LIST: StripePriceListType = {
     type: "recurring",
     billing_scheme: "per_unit",
   },
-  premium: {
+  PREMIUM: {
     price_id: "price_1Tx4jURYUVdsfWEPbsnlijnI",
     lookup_key: "premium-plan",
     currency: "INR",

@@ -1,13 +1,16 @@
 "use client";
 import type { FC } from "react";
-import type { SubscriptionPlanType } from "@/types/clientSide.types";
+import type {
+  SubscriptionPlanType,
+  AvailablePlansType,
+} from "@/types/clientSide.types";
 import { STRIPE_PRICE_LIST } from "@/client/constants/stripeConstants";
 import { useCreateCheckoutSession } from "@/client/hooks/useCreateCheckoutSession";
 
 const PlanCards: FC<{ plan: SubscriptionPlanType }> = ({ plan }) => {
   const checkout = useCreateCheckoutSession();
 
-  const handleSubmission = async (name: "free" | "pro" | "premium") => {
+  const handleSubmission = async (name: AvailablePlansType) => {
     const planInfo = STRIPE_PRICE_LIST[name];
     alert(`You are tying to buy ${planInfo.lookup_key}`);
     try {

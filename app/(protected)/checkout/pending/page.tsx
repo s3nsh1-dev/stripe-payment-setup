@@ -1,19 +1,31 @@
 // app/checkout/success/page.tsx
-export default async function CheckoutPendingPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ session_id?: string }>;
-}) {
-  const { session_id } = await searchParams;
+
+import { useFetchStripeSession } from "@/client/hooks/useFetchStripeSession";
+import { use, type FC } from "react";
+
+const CheckoutPendingPage: FC<PropType> = ({ params }) => {
+  const { session_id } = use(params);
+  const validateSession = useFetchStripeSession({ id: session_id || "" });
 
   if (!session_id) {
-    // handle missing session
+    return <div>Invalid session</div>;
   }
 
-  // Optionally verify server-side by retrieving the session from Stripe
-  // const session = await stripe.checkout.sessions.retrieve(session_id);
+  if (validateSession.isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (validateSession.isError) {
+    return <div>Unable to verify payment.</div>;
+  }
 
   return (
     <div>Transaction in progress, Please wait for sometime: {session_id}</div>
   );
-}
+};
+
+export default CheckoutPendingPage;
+
+type PropType = {
+  params: Promise<{ session_id?: string }>;
+};

@@ -5,7 +5,7 @@ import type {
 
 export const plans: SubscriptionPlanType[] = [
   {
-    name: "free",
+    name: "FREE",
     price: "$0",
     description: "Perfect for trying out the platform.",
     features: [
@@ -20,7 +20,7 @@ export const plans: SubscriptionPlanType[] = [
     redirect: "/contact",
   },
   {
-    name: "pro",
+    name: "PRO",
     price: "$12",
     description: "Ideal for freelancers and professionals.",
     features: [
@@ -35,7 +35,7 @@ export const plans: SubscriptionPlanType[] = [
     redirect: "/contact",
   },
   {
-    name: "premium",
+    name: "PREMIUM",
     price: "$29",
     description: "Built for teams and businesses.",
     features: [

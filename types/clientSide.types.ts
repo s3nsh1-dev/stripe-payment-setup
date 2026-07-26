@@ -30,5 +30,5 @@ export type StripePriceConfig = {
 
 export type Plans = SubscriptionPlanType[];
 export type PricingTiers = PricingTierType[];
-export type AvailablePlansType = "free" | "pro" | "premium";
+export type AvailablePlansType = "FREE" | "PRO" | "PREMIUM";
 export type StripePriceListType = Record<AvailablePlansType, StripePriceConfig>;
