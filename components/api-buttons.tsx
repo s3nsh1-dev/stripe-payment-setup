@@ -3,12 +3,16 @@ import { useFetchStripePrices } from "@/client/hooks/useFetchStripePrices";
 import { useFetchStripeProducts } from "@/client/hooks/useFetchStripeProducts";
 import { useFetchStripePlans } from "@/client/hooks/useFetchStripePlans";
 import { useFetchStripeProductById } from "@/client/hooks/useFetchStripeProductById";
+import { useFetchStripeSession } from "@/client/hooks/useFetchStripeSession";
 
 const ApiButtons = () => {
   const priceFetch = useFetchStripePrices();
   const productFetch = useFetchStripeProducts();
   const planFetch = useFetchStripePlans();
   const productByIdFetch = useFetchStripeProductById();
+  const sessionByIdFetch = useFetchStripeSession({
+    id: "cs_test_a1Z6MfjMuE1sI6XrFChfb8YrNUVo5e7Nj9DuWIX5VG93E4oszmZ7qmtyf3",
+  });
 
   const handleFetchPrice = async () => {
     const data = await priceFetch.refetch();
@@ -26,6 +30,11 @@ const ApiButtons = () => {
   const handleFetchProductById = async () => {
     const data = await productByIdFetch.refetch();
     console.log("PRODUCT BY ID:", data);
+  };
+
+  const handleFetchSessionById = async () => {
+    const data = await sessionByIdFetch.refetch();
+    console.log(data);
   };
 
   const btnInfo = [
@@ -52,6 +61,12 @@ const ApiButtons = () => {
       text: productByIdFetch.isFetching ? "Fetching..." : "Product By Id",
       action: handleFetchProductById,
       disabled: productByIdFetch.isFetching,
+    },
+    {
+      id: 5,
+      text: sessionByIdFetch.isFetching ? "Fetching..." : "Session By Id",
+      action: handleFetchSessionById,
+      disabled: sessionByIdFetch.isFetching,
     },
   ];
 

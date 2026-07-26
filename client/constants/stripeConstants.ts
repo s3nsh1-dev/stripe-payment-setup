@@ -37,4 +37,11 @@ const PRICE_TO_TIER: Record<string, "PRO" | "PREMIUM"> = {
   price_premium_monthly: "PREMIUM",
 };
 
-export { STRIPE_PRICE_LIST, ALLOWED_PRICE_IDS, PRICE_TO_TIER };
+const STRIPE_PRODUCT_ID = "prod_UwPSVhz4PG85hQ";
+
+export {
+  STRIPE_PRICE_LIST,
+  ALLOWED_PRICE_IDS,
+  PRICE_TO_TIER,
+  STRIPE_PRODUCT_ID,
+};

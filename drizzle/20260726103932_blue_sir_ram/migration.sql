@@ -1,4 +1,3 @@
-CREATE TYPE "plan" AS ENUM('FREE', 'PRO', 'PREMIUM');--> statement-breakpoint
 CREATE TYPE "subscription_status" AS ENUM('active', 'trialing', 'past_due', 'canceled', 'unpaid', 'incomplete', 'incomplete_expired');--> statement-breakpoint
 CREATE TABLE "subscription" (
 	"id" text PRIMARY KEY,

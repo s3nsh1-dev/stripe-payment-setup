@@ -21,8 +21,11 @@ const PlanCards: FC<{ plan: SubscriptionPlanType }> = ({ plan }) => {
         { priceId: planInfo.price_id, quantity: 1 },
         {
           onSuccess: (res) => {
-            window.location.href = res.data.url; // redirect to Stripe-hosted page
-            console.log(res.data);
+            window.location.href = res?.data?.url; // redirect to Stripe-hosted page
+            console.log(res?.data);
+          },
+          onError: (data) => {
+            console.error(data);
           },
         },
       );

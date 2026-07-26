@@ -1,10 +1,10 @@
 // app/checkout/success/page.tsx
-
+"use client";
 import { useFetchStripeSession } from "@/client/hooks/useFetchStripeSession";
 import { use, type FC } from "react";
 
-const CheckoutPendingPage: FC<PropType> = ({ params }) => {
-  const { session_id } = use(params);
+const CheckoutPendingPage: FC<PropType> = ({ searchParams }) => {
+  const { session_id } = use(searchParams);
   const validateSession = useFetchStripeSession({ id: session_id || "" });
 
   if (!session_id) {
@@ -35,5 +35,5 @@ const CheckoutPendingPage: FC<PropType> = ({ params }) => {
 export default CheckoutPendingPage;
 
 type PropType = {
-  params: Promise<{ session_id?: string }>;
+  searchParams: Promise<{ session_id?: string }>;
 };

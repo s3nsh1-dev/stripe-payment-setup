@@ -108,6 +108,7 @@ export async function POST(request: Request) {
       { status: 200 },
     );
   } catch (error) {
+    console.error("[POST /api/stripe/checkouts] Error:", error);
     const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
       { message: "Something went wrong", error: message },

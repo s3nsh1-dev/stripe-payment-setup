@@ -11,6 +11,7 @@ const useFetchStripeSession = ({ id }: { id?: string }) => {
       return data;
     },
     enabled: !!id,
+    // enabled: false,
   });
 };
 export { useFetchStripeSession };
