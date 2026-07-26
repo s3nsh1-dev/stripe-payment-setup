@@ -1,6 +1,7 @@
-export const plans = [
+import { SubscriptionPlanType } from "@/types/clientSide.types";
+export const plans: SubscriptionPlanType[] = [
   {
-    name: "Free",
+    name: "free",
     price: "$0",
     description: "Perfect for trying out the platform.",
     features: [
@@ -15,7 +16,7 @@ export const plans = [
     redirect: "/contact",
   },
   {
-    name: "Pro",
+    name: "pro",
     price: "$12",
     description: "Ideal for freelancers and professionals.",
     features: [
@@ -30,7 +31,7 @@ export const plans = [
     redirect: "/contact",
   },
   {
-    name: "Premium",
+    name: "premium",
     price: "$29",
     description: "Built for teams and businesses.",
     features: [
