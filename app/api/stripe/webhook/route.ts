@@ -85,6 +85,7 @@ export async function POST(request: Request) {
         await db
           .update(subscription)
           .set({
+            plan: PRICE_TO_TIER[priceId],
             stripePriceId: priceId,
             status: stripeSubscription.status,
             stripeCurrentPeriodEnd: new Date(

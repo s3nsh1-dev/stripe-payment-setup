@@ -7,6 +7,7 @@ const Navbar = () => {
     { href: "/sign-in", label: "Sign In" },
     { href: "/sign-up", label: "Sign Up" },
     { href: "/sign-out", label: "Sign Out" },
+    { href: "/subscription", label: "Subscription" },
   ];
 
   return (

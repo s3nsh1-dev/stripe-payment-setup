@@ -37,55 +37,102 @@ export async function POST(request: Request) {
 
     const userId = userSession.user.id;
 
-    const customerId = await db.transaction(async (tx) => {
-      // lock the subscription row for this user, if it exists
-      const subRows = await tx
-        .select()
-        .from(subscription)
-        .where(eq(subscription.userId, userId))
-        .for("update");
+    const { customerId, existingSubscription } = await db.transaction(
+      async (tx) => {
+        // lock the subscription row for this user, if it exists
+        const subRows = await tx
+          .select()
+          .from(subscription)
+          .where(eq(subscription.userId, userId))
+          .for("update");
 
-      const existingSub = subRows[0];
+        const existingSub = subRows[0];
 
-      // already has a Stripe customer — reuse it, nothing else to do
-      if (existingSub?.stripeCustomerId) {
-        return existingSub.stripeCustomerId;
-      }
+        // already has a Stripe customer — reuse it, nothing else to do
+        if (existingSub?.stripeCustomerId) {
+          return {
+            customerId: existingSub.stripeCustomerId,
+            existingSubscription: existingSub,
+          };
+        }
 
-      // need user's email/name to create the Stripe customer
-      const userRows = await tx.select().from(user).where(eq(user.id, userId));
-      const existingUser = userRows[0];
+        // need user's email/name to create the Stripe customer
+        const userRows = await tx
+          .select()
+          .from(user)
+          .where(eq(user.id, userId));
+        const existingUser = userRows[0];
 
-      if (!existingUser) {
-        throw new Error("User not found");
-      }
+        if (!existingUser) {
+          throw new Error("User not found");
+        }
 
-      const createCustomer = await STRIPE_CLIENT.customers.create({
-        email: existingUser.email,
-        metadata: {
-          userId: existingUser.id,
-          username: existingUser.name,
-        },
-      });
-
-      if (existingSub) {
-        // subscription row exists (e.g. FREE plan) but has no customerId yet
-        await tx
-          .update(subscription)
-          .set({ stripeCustomerId: createCustomer.id })
-          .where(eq(subscription.userId, userId));
-      } else {
-        // no subscription row at all yet — create one
-        await tx.insert(subscription).values({
-          id: crypto.randomUUID(),
-          userId,
-          stripeCustomerId: createCustomer.id,
-          plan: PRICE_TO_TIER[priceId],
+        const createCustomer = await STRIPE_CLIENT.customers.create({
+          email: existingUser.email,
+          name: existingUser.name,
+          description: `Subscription customer for ${existingUser.email}`,
+          metadata: {
+            userId: existingUser.id,
+            username: existingUser.name,
+          },
         });
+
+        if (existingSub) {
+          // subscription row exists (e.g. FREE plan) but has no customerId yet
+          await tx
+            .update(subscription)
+            .set({ stripeCustomerId: createCustomer.id })
+            .where(eq(subscription.userId, userId));
+        } else {
+          // no subscription row at all yet — create one
+          await tx.insert(subscription).values({
+            id: crypto.randomUUID(),
+            userId,
+            stripeCustomerId: createCustomer.id,
+            plan: PRICE_TO_TIER[priceId],
+          });
+        }
+
+        return {
+          customerId: createCustomer.id,
+          existingSubscription: existingSub,
+        };
+      },
+    );
+
+    // Checkout is for collecting payment details for a new subscription.
+    // An active subscriber already has a saved payment method, so changing
+    // their existing subscription prevents Stripe from creating a duplicate.
+    if (
+      existingSubscription?.status === "active" &&
+      existingSubscription.stripeSubscriptionId
+    ) {
+      const currentStripeSubscription =
+        await STRIPE_CLIENT.subscriptions.retrieve(
+          existingSubscription.stripeSubscriptionId,
+        );
+      const currentItem = currentStripeSubscription.items.data[0];
+
+      if (!currentItem) {
+        throw new Error("Active Stripe subscription has no subscription item");
       }
 
-      return createCustomer.id;
-    });
+      const updatedSubscription = await STRIPE_CLIENT.subscriptions.update(
+        existingSubscription.stripeSubscriptionId,
+        {
+          items: [{ id: currentItem.id, price: priceId }],
+          proration_behavior: "create_prorations",
+        },
+      );
+
+      return NextResponse.json(
+        {
+          message: "Subscription successfully updated",
+          data: updatedSubscription,
+        },
+        { status: 200 },
+      );
+    }
 
     const checkoutSession = await STRIPE_CLIENT.checkout.sessions.create({
       customer: customerId,

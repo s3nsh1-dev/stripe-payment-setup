@@ -8,7 +8,7 @@ import * as schema from "@/server/schema/index";
 import { nextCookies } from "better-auth/next-js";
 
 export const auth = betterAuth({
-  baseURL: envServer.NEXT_PUBLIC_BASE_URL,
+  baseURL: envServer.BETTER_AUTH_URL,
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: schema,
