@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { eq } from "drizzle-orm";
 import { plans } from "@/client/constants/commonConstant";
+import { CancelSubscriptionButton } from "@/components/cancel-subscription-button";
 import { PlanCards } from "@/components/plan-cards";
 import { db } from "@/server/config/db.connect";
 import { requireAuth } from "@/server/lib/auth-guard";
@@ -15,14 +16,23 @@ const SubscriptionPage = async () => {
   const currentSubscription = rows[0];
   const currentPlan = currentSubscription?.plan ?? "FREE";
   const targetPlan =
-    currentSubscription?.status === "active" && currentPlan === "PRO"
+    currentSubscription?.status === "active" &&
+    !currentSubscription?.stripeCancelAtPeriodEnd &&
+    currentPlan === "PRO"
       ? "PREMIUM"
-      : currentSubscription?.status === "active" && currentPlan === "PREMIUM"
+      : currentSubscription?.status === "active" &&
+          !currentSubscription?.stripeCancelAtPeriodEnd &&
+          currentPlan === "PREMIUM"
         ? "PRO"
         : null;
   const targetPlanInfo = targetPlan
     ? plans.find((plan) => plan.name === targetPlan)
     : undefined;
+  const canCancel =
+    (currentSubscription?.status === "active" ||
+      currentSubscription?.status === "trialing") &&
+    Boolean(currentSubscription?.stripeSubscriptionId) &&
+    !currentSubscription?.stripeCancelAtPeriodEnd;
 
   return (
     <main className="min-h-[calc(100vh-4rem)] bg-zinc-950 px-6 py-10 text-white">
@@ -69,6 +79,29 @@ const SubscriptionPage = async () => {
               value={currentSubscription?.stripeCancelAtPeriodEnd ? "Yes" : "No"}
             />
           </div>
+
+          {canCancel && (
+            <div className="mt-8 flex flex-col gap-4 rounded-2xl border border-rose-500/20 bg-rose-500/5 p-5 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="font-semibold text-rose-200">
+                  Cancel this subscription
+                </h3>
+                <p className="mt-1 text-sm leading-6 text-zinc-400">
+                  You will keep access until the current billing period ends.
+                  Stripe will not renew the subscription after that date.
+                </p>
+              </div>
+              <CancelSubscriptionButton />
+            </div>
+          )}
+
+          {currentSubscription?.stripeCancelAtPeriodEnd && (
+            <div className="mt-8 rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5 text-sm leading-6 text-amber-200">
+              Cancellation is scheduled for the end of the current billing
+              period: {formatDate(currentSubscription.stripeCurrentPeriodEnd)}.
+              Your access remains active until then.
+            </div>
+          )}
         </section>
 
         {targetPlanInfo ? (
@@ -93,6 +126,16 @@ const SubscriptionPage = async () => {
                 }}
               />
             </div>
+          </section>
+        ) : currentSubscription?.stripeCancelAtPeriodEnd ? (
+          <section className="rounded-3xl border border-amber-500/20 bg-amber-500/5 p-8">
+            <h2 className="text-2xl font-semibold text-amber-100">
+              Subscription ending soon
+            </h2>
+            <p className="mt-2 text-zinc-400">
+              Your current plan remains available until the billing period ends.
+              Plan changes are disabled while cancellation is scheduled.
+            </p>
           </section>
         ) : (
           <section className="rounded-3xl border border-zinc-800 bg-zinc-900 p-8">
