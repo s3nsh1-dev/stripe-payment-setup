@@ -6,26 +6,47 @@ import type {
 } from "@/types/clientSide.types";
 import { STRIPE_PRICE_LIST } from "@/client/constants/stripeConstants";
 import { useCreateCheckoutSession } from "@/client/hooks/useCreateCheckoutSession";
-import { redirect } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 const PlanCards: FC<{ plan: SubscriptionPlanType }> = ({ plan }) => {
   const checkout = useCreateCheckoutSession();
+  const queryClient = useQueryClient();
+  const router = useRouter();
 
   const handleSubmission = async (name: AvailablePlansType) => {
     const planInfo = STRIPE_PRICE_LIST[name];
-    alert(`You are tying to buy ${planInfo.lookup_key}`);
-    if (name === "FREE") redirect("/dashboard");
+    window.alert(`You are trying to buy ${planInfo.lookup_key}`);
+    if (name === "FREE") {
+      window.location.assign("/dashboard");
+      return;
+    }
 
     try {
       checkout.mutate(
         { priceId: planInfo.price_id, quantity: 1 },
         {
           onSuccess: (res) => {
-            window.location.href = res?.data?.url; // redirect to Stripe-hosted page
-            console.log(res?.data);
+            const checkoutUrl = res?.data?.url;
+
+            // New subscribers receive a Checkout Session URL and must enter
+            // payment details on Stripe's hosted page.
+            if (checkoutUrl) {
+              window.location.assign(checkoutUrl);
+              return;
+            }
+
+            // Existing subscribers are updated immediately and receive a
+            // Subscription object instead of a redirect URL.
+            queryClient.invalidateQueries({ queryKey: ["subscription"] });
+            window.alert(
+              res?.message ?? "Your subscription was updated successfully.",
+            );
+            router.refresh();
           },
           onError: (data) => {
             console.error(data);
+            window.alert("Unable to update your subscription.");
           },
         },
       );
