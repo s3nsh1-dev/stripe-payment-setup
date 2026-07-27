@@ -7,6 +7,7 @@ import { envServer } from "@/server/utils/envServer";
 import { db } from "@/server/config/db.connect";
 import { subscription } from "@/server/schema";
 import { eq } from "drizzle-orm";
+import { PRICE_TO_TIER } from "@/client/constants/stripeConstants";
 
 export async function POST(request: Request) {
   // 1. Raw body — required for signature verification, do NOT use request.json() here
@@ -66,7 +67,7 @@ export async function POST(request: Request) {
               stripeSubscription.items.data[0].current_period_end * 1000,
             ),
             stripeCancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
-            plan: "PRO", // or derive from priceId via a lookup map if you support multiple tiers
+            plan: PRICE_TO_TIER[priceId], // PRO || PREMIUM
           })
           .where(eq(subscription.userId, userId));
 
