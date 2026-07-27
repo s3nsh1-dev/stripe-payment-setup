@@ -1,11 +1,8 @@
-import type {
-  SubscriptionPlanType,
-  PricingTierType,
-} from "@/types/clientSide.types";
+import type { SubscriptionPlanType } from "@/types/clientSide.types";
 
 export const plans: SubscriptionPlanType[] = [
   {
-    name: "free",
+    name: "FREE",
     price: "$0",
     description: "Perfect for trying out the platform.",
     features: [
@@ -20,7 +17,7 @@ export const plans: SubscriptionPlanType[] = [
     redirect: "/contact",
   },
   {
-    name: "pro",
+    name: "PRO",
     price: "$12",
     description: "Ideal for freelancers and professionals.",
     features: [
@@ -35,7 +32,7 @@ export const plans: SubscriptionPlanType[] = [
     redirect: "/contact",
   },
   {
-    name: "premium",
+    name: "PREMIUM",
     price: "$29",
     description: "Built for teams and businesses.",
     features: [
@@ -48,52 +45,5 @@ export const plans: SubscriptionPlanType[] = [
     button: "Go Premium",
     highlighted: false,
     redirect: "/contact",
-  },
-];
-
-export const pricingTiers: PricingTierType[] = [
-  {
-    id: "free",
-    name: "Free",
-    price: 0,
-    priceId: null,
-    currency: "INR",
-    interval: "month",
-    features: [
-      "Access to basic features",
-      "Limited usage",
-      "Community support",
-    ],
-    isPopular: false,
-  },
-  {
-    id: "pro",
-    name: "Pro",
-    price: 10,
-    priceId: "pro",
-    currency: "INR",
-    interval: "month",
-    features: [
-      "All Free features",
-      "Generous usage limit",
-      "Priority support",
-      "Access to pro content",
-    ],
-    isPopular: true,
-  },
-  {
-    id: "premium",
-    name: "Premium",
-    price: 10,
-    priceId: "premium",
-    currency: "INR",
-    interval: "month",
-    features: [
-      "All Free features",
-      "Unlimited usage",
-      "Priority support",
-      "Access to premium content",
-    ],
-    isPopular: true,
   },
 ];

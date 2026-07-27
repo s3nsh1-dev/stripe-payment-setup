@@ -8,6 +8,15 @@ import {
 } from "drizzle-orm/pg-core";
 
 export const planEnum = pgEnum("plan", ["FREE", "PRO", "PREMIUM"]); // adjust values to match yours
+export const subscriptionStatusEnum = pgEnum("subscription_status", [
+  "active",
+  "trialing",
+  "past_due",
+  "canceled",
+  "unpaid",
+  "incomplete",
+  "incomplete_expired",
+]);
 
 const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -18,14 +27,42 @@ const user = pgTable("user", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
-    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .$onUpdate(() => new Date())
     .notNull(),
-  plan: planEnum("plan").default("FREE").notNull(),
-  stripeCustomerId: text("stripeCustomerId"),
-  stripeSubscriptionId: text("stripeSubscriptionId"),
-  stripePriceId: text("stripePriceId"),
-  stripeCurrentPeriodEnd: text("stripeCurrentPeriodEnd"),
+  // no plan/stripe fields here anymore — remove entirely, moved to subscription table
 });
+
+const subscription = pgTable(
+  "subscription",
+  {
+    id: text("id").primaryKey(), // e.g. nanoid/uuid generated in your app
+    userId: text("user_id")
+      .notNull()
+      .unique() // enforces 1 subscription row per user (1:1)
+      .references(() => user.id, { onDelete: "cascade" }),
+
+    plan: planEnum("plan").default("FREE").notNull(),
+    status: subscriptionStatusEnum("status"), // null until they ever subscribe
+
+    stripeCustomerId: text("stripe_customer_id").unique(),
+    stripeSubscriptionId: text("stripe_subscription_id").unique(),
+    stripePriceId: text("stripe_price_id"),
+    stripeCurrentPeriodEnd: timestamp("stripe_current_period_end"),
+    stripeCancelAtPeriodEnd: boolean("stripe_cancel_at_period_end").default(
+      false,
+    ),
+
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("subscription_userId_idx").on(table.userId),
+    index("subscription_stripeCustomerId_idx").on(table.stripeCustomerId),
+  ],
+);
 
 const session = pgTable(
   "session",
@@ -86,7 +123,7 @@ const verification = pgTable(
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
-export { user, session, account, verification };
+export { user, session, account, verification, subscription };
 
 // NOTE: Relations are NOT needed for better-auth — foreign keys are defined
 // inline with .references() above. If you ever need Drizzle's relational

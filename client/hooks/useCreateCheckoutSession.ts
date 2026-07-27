@@ -9,8 +9,12 @@ interface CreateCheckoutPayload {
 const useCreateCheckoutSession = () => {
   return useMutation({
     mutationFn: async (payload: CreateCheckoutPayload) => {
-      const { data } = await axios.post(`/api/stripe/checkouts`, payload);
-      return data;
+      try {
+        const { data } = await axios.post(`/api/stripe/checkouts`, payload);
+        return data;
+      } catch (error) {
+        throw error;
+      }
     },
   });
 };

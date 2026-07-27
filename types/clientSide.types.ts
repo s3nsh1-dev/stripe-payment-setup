@@ -8,17 +8,6 @@ export type SubscriptionPlanType = {
   redirect: string;
 };
 
-export type PricingTierType = {
-  id: string;
-  name: string;
-  price: number;
-  priceId: string | null;
-  currency: string;
-  interval: string;
-  features: string[];
-  isPopular: boolean;
-};
-
 export type StripePriceConfig = {
   price_id: string;
   lookup_key: string;
@@ -29,6 +18,5 @@ export type StripePriceConfig = {
 };
 
 export type Plans = SubscriptionPlanType[];
-export type PricingTiers = PricingTierType[];
-export type AvailablePlansType = "free" | "pro" | "premium";
+export type AvailablePlansType = "FREE" | "PRO" | "PREMIUM";
 export type StripePriceListType = Record<AvailablePlansType, StripePriceConfig>;

@@ -3,29 +3,66 @@ import { useFetchStripePrices } from "@/client/hooks/useFetchStripePrices";
 import { useFetchStripeProducts } from "@/client/hooks/useFetchStripeProducts";
 import { useFetchStripePlans } from "@/client/hooks/useFetchStripePlans";
 import { useFetchStripeProductById } from "@/client/hooks/useFetchStripeProductById";
+import { useFetchStripeSession } from "@/client/hooks/useFetchStripeSession";
 
 const ApiButtons = () => {
   const priceFetch = useFetchStripePrices();
   const productFetch = useFetchStripeProducts();
   const planFetch = useFetchStripePlans();
   const productByIdFetch = useFetchStripeProductById();
+  const sessionByIdFetch = useFetchStripeSession({
+    id: "",
+  });
 
   const handleFetchPrice = async () => {
-    const data = await priceFetch.refetch();
-    console.log("PRICES:", data);
+    const result = await priceFetch.refetch();
+    if (result.error) {
+      console.error("SESSION BY ID ERROR:", result.error);
+      return;
+    }
+
+    console.log("PRICES:", result.data?.data);
   };
   const handleFetchProducts = async () => {
-    const data = await productFetch.refetch();
-    console.log("PRODUCTS:", data);
+    const result = await productFetch.refetch();
+    if (result.error) {
+      console.error("SESSION BY ID ERROR:", result.error);
+      return;
+    }
+
+    console.log("PRODUCTS:", result.data?.data);
   };
   const handleFetchPlans = async () => {
-    const data = await planFetch.refetch();
-    console.log("PLANS:", data);
+    const result = await planFetch.refetch();
+    if (result.error) {
+      console.error("SESSION BY ID ERROR:", result.error);
+      return;
+    }
+
+    console.log("PLANS:", result.data?.data);
   };
 
   const handleFetchProductById = async () => {
-    const data = await productByIdFetch.refetch();
-    console.log("PRODUCT BY ID:", data);
+    const result = await productByIdFetch.refetch();
+    if (result.error) {
+      console.error("SESSION BY ID ERROR:", result.error);
+      return;
+    }
+
+    console.log("PRODUCT BY ID:", result.data?.data);
+  };
+
+  const handleFetchSessionById = async () => {
+    const result = await sessionByIdFetch.refetch();
+
+    if (result.error) {
+      console.error("SESSION BY ID ERROR:", result.error);
+      return;
+    }
+
+    // The API returns { message, data }, so the Stripe Checkout Session is
+    // in result.data.data rather than result.data itself.
+    console.log("SESSION BY ID:", result.data?.data);
   };
 
   const btnInfo = [
@@ -52,6 +89,12 @@ const ApiButtons = () => {
       text: productByIdFetch.isFetching ? "Fetching..." : "Product By Id",
       action: handleFetchProductById,
       disabled: productByIdFetch.isFetching,
+    },
+    {
+      id: 5,
+      text: sessionByIdFetch.isFetching ? "Fetching..." : "Session By Id",
+      action: handleFetchSessionById,
+      disabled: sessionByIdFetch.isFetching,
     },
   ];
 
