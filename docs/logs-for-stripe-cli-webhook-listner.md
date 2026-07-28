@@ -1,4 +1,10 @@
-> Ready! You are using Stripe API Version [2026-06-24.dahlia]. Your webhook signing secret is whsec_c1dacc513adf902fb205e8369aca6971a95f822dc76a3cc2e306a1e1130230ca (^C to quit)
+Stripe CLI install globally
+then stripe login with the account that have your payment (test/live) interface/project
+after that run below command to start a server that looks at localhost:3000 and check for stripe.event and talk to stripe and call your webhook endpoint with stripe event info for sync/async work
+
+> > stripe listen --forward-to localhost:3000/api/stripe/webhook
+
+> Ready! You are using Stripe API Version [2026-06-24.dahlia]. Your webhook signing secret is <STRIPE_WEBHOOK_SECRET_GENERATED_BY_STRIPE_CLI_COMMAND> (^C to quit)
 > 2026-07-27 17:47:17 --> invoiceitem.created [evt_1TxnT6RYUVdsfWEPfntYq8mw]
 > 2026-07-27 17:47:17 --> customer.subscription.updated [evt_1TxnT6RYUVdsfWEPOa02WvEr]
 > 2026-07-27 17:47:17 <-- [200] POST http://localhost:3000/api/stripe/webhook [evt_1TxnT6RYUVdsfWEPfntYq8mw]
