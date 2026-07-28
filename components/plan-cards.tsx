@@ -18,7 +18,7 @@ const PlanCards: FC<{ plan: SubscriptionPlanType }> = ({ plan }) => {
     const planInfo = STRIPE_PRICE_LIST[name];
     window.alert(`You are trying to buy ${planInfo.lookup_key}`);
     if (name === "FREE") {
-      window.location.assign("/dashboard");
+      router.push("/dashboard");
       return;
     }
 

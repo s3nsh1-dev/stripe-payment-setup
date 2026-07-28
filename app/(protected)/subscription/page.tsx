@@ -2,6 +2,7 @@ import Link from "next/link";
 import { eq } from "drizzle-orm";
 import { plans } from "@/client/constants/commonConstant";
 import { CancelSubscriptionButton } from "@/components/cancel-subscription-button";
+import { CancelSubscriptionImmediatelyButton } from "@/components/cancel-subscription-immediately-button";
 import { PlanCards } from "@/components/plan-cards";
 import { db } from "@/server/config/db.connect";
 import { requireAuth } from "@/server/lib/auth-guard";
@@ -33,6 +34,10 @@ const SubscriptionPage = async () => {
       currentSubscription?.status === "trialing") &&
     Boolean(currentSubscription?.stripeSubscriptionId) &&
     !currentSubscription?.stripeCancelAtPeriodEnd;
+  const canCancelImmediately =
+    (currentSubscription?.status === "active" ||
+      currentSubscription?.status === "trialing") &&
+    Boolean(currentSubscription?.stripeSubscriptionId);
 
   return (
     <main className="min-h-[calc(100vh-4rem)] bg-zinc-950 px-6 py-10 text-white">
@@ -91,15 +96,23 @@ const SubscriptionPage = async () => {
                   Stripe will not renew the subscription after that date.
                 </p>
               </div>
-              <CancelSubscriptionButton />
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <CancelSubscriptionButton />
+                <CancelSubscriptionImmediatelyButton />
+              </div>
             </div>
           )}
 
           {currentSubscription?.stripeCancelAtPeriodEnd && (
-            <div className="mt-8 rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5 text-sm leading-6 text-amber-200">
-              Cancellation is scheduled for the end of the current billing
-              period: {formatDate(currentSubscription.stripeCurrentPeriodEnd)}.
-              Your access remains active until then.
+            <div className="mt-8 flex flex-col gap-4 rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5 text-sm leading-6 text-amber-200 sm:flex-row sm:items-center sm:justify-between">
+              <p>
+                Cancellation is scheduled for the end of the current billing
+                period: {formatDate(currentSubscription.stripeCurrentPeriodEnd)}.
+                Your access remains active until then.
+              </p>
+              {canCancelImmediately && (
+                <CancelSubscriptionImmediatelyButton />
+              )}
             </div>
           )}
         </section>
