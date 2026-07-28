@@ -1,0 +1,76 @@
+# =============================================================================
+# docker-compose.yml — Single EC2 host deployment
+#
+# Services:
+#   1. app    — Next.js standalone server (port 3000, internal only)
+#   2. caddy  — Reverse proxy with automatic HTTPS (ports 80 & 443, public)
+#
+# Database:
+#   Uses Neon managed PostgreSQL (external) — no DB container needed.
+#
+# Secrets:
+#   All runtime secrets are injected via .env.production.
+#   On a real EC2 deployment, prefer pulling secrets from AWS Secrets Manager
+#   via a startup script and writing them to .env.production before running
+#   docker compose up.
+# =============================================================================
+
+services:
+  # ---------- Next.js application ----------
+  app:
+    build:
+      context: .
+      dockerfile: DockerFile
+      args:
+        # Build-time args — NEXT_PUBLIC_* vars are inlined during `next build`
+        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
+        NEXT_PUBLIC_BASE_URL: ${NEXT_PUBLIC_BASE_URL}
+    container_name: stripe-app
+    restart: unless-stopped
+    expose:
+      - "3000"     # Internal only — Caddy proxies to this
+    env_file:
+      - .env.production
+    environment:
+      - NODE_ENV=production
+      - HOSTNAME=0.0.0.0
+      - PORT=3000
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/auth/session"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # ---------- Caddy reverse proxy ----------
+  caddy:
+    image: caddy:2-alpine
+    container_name: stripe-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"     # HTTP  (redirects to HTTPS + ACME challenge)
+      - "443:443"   # HTTPS (TLS termination)
+      - "443:443/udp"  # HTTP/3 (QUIC)
+    volumes:
+      - ./CaddyFile:/etc/caddy/Caddyfile  # Mount your Caddyfile
+      - caddy_data:/data                   # TLS certificates (persist across restarts)
+      - caddy_config:/config               # Caddy runtime config
+    environment:
+      - DOMAIN=${DOMAIN:-your-domain.example.com}
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  caddy_data:
+    driver: local
+  caddy_config:
+    driver: local
