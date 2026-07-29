@@ -1,0 +1,78 @@
+# =============================================================================
+# Caddyfile — Production reverse proxy for the Stripe payment app
+#
+# What this does:
+#   1. Listens on :80 and :443 for your domain
+#   2. Automatically obtains and renews a TLS certificate via Let's Encrypt
+#   3. Proxies all traffic to the Next.js app container on port 3000
+#   4. Adds security headers (HSTS, CSP, X-Content-Type-Options, etc.)
+#   5. Strips sensitive server headers
+#
+# IMPORTANT:
+#   Replace {$DOMAIN} with your actual domain, or set the DOMAIN env var
+#   in docker-compose.yml. Caddy uses {$VAR} syntax for environment variables.
+#
+# TLS:
+#   Caddy auto-provisions HTTPS via Let's Encrypt. For this to work:
+#   - Port 80 and 443 must be open on the EC2 security group
+#   - DNS A record must point to the EC2 public IP
+#   - No other process can be binding to port 80/443
+# =============================================================================
+
+{$DOMAIN} {
+
+    # ── Reverse proxy to Next.js app ──
+    reverse_proxy app:3000 {
+        # Pass original client IP so Next.js sees real IPs, not Docker's
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+
+        # Health checking the upstream
+        health_uri /api/auth/session
+        health_interval 30s
+        health_timeout 5s
+    }
+
+    # ── Security headers ──
+    header {
+        # HSTS — tell browsers to always use HTTPS (1 year)
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+        # Prevent MIME-type sniffing
+        X-Content-Type-Options "nosniff"
+
+        # Clickjacking protection — only allow your own domain to frame
+        X-Frame-Options "SAMEORIGIN"
+
+        # Referrer policy — don't leak full URL to third parties
+        Referrer-Policy "strict-origin-when-cross-origin"
+
+        # Permissions policy — disable features you don't use
+        Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(self)"
+
+        # Content Security Policy
+        # - Allows self, inline styles/scripts (Next.js needs these),
+        #   Stripe's JS SDK domains, Google Fonts, and OAuth avatar sources
+        Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://m.stripe.network; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://lh3.googleusercontent.com https://avatars.githubusercontent.com https://cdn.pixabay.com https://*.stripe.com; frame-src https://js.stripe.com https://hooks.stripe.com; connect-src 'self' https://api.stripe.com https://m.stripe.network; object-src 'none'; base-uri 'self'; form-action 'self';"
+
+        # Remove server identification headers
+        -Server
+        -X-Powered-By
+    }
+
+    # ── Access logs ──
+    log {
+        output file /data/logs/access.log {
+            roll_size 50MiB
+            roll_keep 5
+            roll_keep_for 168h
+        }
+        format json
+        # Don't log cookies or authorization headers
+        level INFO
+    }
+
+    # ── Compression ──
+    encode gzip zstd
+}

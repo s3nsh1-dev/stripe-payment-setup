@@ -29,8 +29,10 @@ Stripe provides two different ideas that are easy to confuse:
 | Cancel at period end | `subscriptions.update({ cancel_at_period_end: true })` | Continues until the period ends |
 | Cancel immediately | `subscriptions.cancel(subscriptionId)` | Ends immediately according to Stripe’s cancellation rules |
 
-This project implements the first behavior. The application’s existing
-`stripeCancelAtPeriodEnd` database field was designed for this state.
+The original implementation implemented the first behavior. The application
+now supports both behaviors through separate routes, hooks, and buttons. The
+existing `stripeCancelAtPeriodEnd` database field continues to represent only
+the scheduled-cancellation state.
 
 The cancellation request does not refund the customer automatically. It also
 does not remove the Stripe Customer, because the Customer may be reused if the
@@ -319,9 +321,11 @@ plan to FREE and clears the active Subscription ID.
 
 ## 10. What this feature does not implement
 
-This feature does not yet provide:
+Immediate cancellation is implemented separately in
+[`immediate cancellation implementation`](./immediate-subscription-cancellation-implementation.md).
 
-- immediate cancellation;
+The scheduled-cancellation flow still does not provide:
+
 - refunds or credits;
 - a “resume subscription” action;
 - changing the cancellation date;
